@@ -133,7 +133,7 @@ const ReservationTable: React.FC = () => {
                 onClick={() => handleSort('full_name')}
               >
                 <div className="flex items-center space-x-1">
-                  <span>Guest Name</span>
+                  <span className="whitespace-nowrap">Guest Name</span>
                   {sortField === 'full_name' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
@@ -201,7 +201,7 @@ const ReservationTable: React.FC = () => {
                 onClick={() => handleSort('special_occasion')}
               >
                 <div className="flex items-center space-x-1">
-                  <span>Special Occasion</span>
+                  <span>Occasion</span>
                   {sortField === 'special_occasion' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
@@ -213,7 +213,7 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                 Chef's Table
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
