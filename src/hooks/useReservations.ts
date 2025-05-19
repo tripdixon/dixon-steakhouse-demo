@@ -13,20 +13,14 @@ export const useReservations = () => {
   const deleteReservation = async (id: string) => {
     try {
       console.log("Deleting reservation:", id);
-      const { error, count } = await supabase
+      const { error } = await supabase
         .from('reservations')
         .delete()
-        .eq('id', id)
-        .select('count');
+        .eq('id', id);
 
       if (error) {
         console.error("Delete error:", error);
         throw error;
-      }
-
-      if (!count) {
-        console.error("No rows were deleted");
-        throw new Error('No rows were deleted');
       }
 
       // Remove from local state immediately for better UX
