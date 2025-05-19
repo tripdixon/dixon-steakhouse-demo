@@ -24,7 +24,6 @@ const ReservationTable: React.FC = () => {
 
   const formatDate = (dateStr: string) => {
     try {
-      // Parse the date string directly without timezone adjustment
       const [year, month, day] = dateStr.split('-').map(Number);
       const date = new Date(year, month - 1, day);
       return dateFnsFormat(date, 'MMM dd, yyyy');
@@ -35,7 +34,6 @@ const ReservationTable: React.FC = () => {
 
   const formatTime = (timeStr: string) => {
     try {
-      // Handle different time formats
       const [hours, minutes] = timeStr.split(':');
       return dateFnsFormat(new Date().setHours(Number(hours), Number(minutes)), 'h:mm a');
     } catch {
@@ -45,25 +43,19 @@ const ReservationTable: React.FC = () => {
 
   const formatPhoneNumber = (phoneStr: string) => {
     try {
-      // Remove any non-numeric characters
       const numbers = phoneStr.replace(/\D/g, '');
       
-      // Check if country code is already included
       let formattedNumber;
       if (numbers.length === 10) {
-        // Add +1 country code for US numbers if not present
         formattedNumber = `+1-${numbers.substring(0, 3)}-${numbers.substring(3, 6)}-${numbers.substring(6, 10)}`;
       } else if (numbers.length === 11 && numbers.startsWith('1')) {
-        // If it's 11 digits and starts with 1, format with country code
         formattedNumber = `+${numbers.substring(0, 1)}-${numbers.substring(1, 4)}-${numbers.substring(4, 7)}-${numbers.substring(7, 11)}`;
       } else {
-        // For other formats, try to normalize as best as possible
         formattedNumber = `+1-${phoneStr}`;
       }
       
       return formattedNumber;
     } catch {
-      // If any error occurs, return the original string
       return phoneStr;
     }
   };
@@ -78,30 +70,33 @@ const ReservationTable: React.FC = () => {
   };
 
   const sortedReservations = React.useMemo(() => {
-    if (!sortField) return reservations;
-    
-    return [...reservations].sort((a, b) => {
-      if (sortField === 'reservation_date') {
-        const dateA = new Date(a.reservation_date);
-        const dateB = new Date(b.reservation_date);
-        return sortDirection === 'asc' 
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime();
-      }
+    const sortReservations = (list: Reservation[]) => {
+      if (!sortField) return list;
       
-      if (sortField === 'guests') {
+      return [...list].sort((a, b) => {
+        if (sortField === 'reservation_date') {
+          const dateA = new Date(a.reservation_date);
+          const dateB = new Date(b.reservation_date);
+          return sortDirection === 'asc' 
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
+        }
+        
+        if (sortField === 'guests') {
+          return sortDirection === 'asc'
+            ? (a.guests || 0) - (b.guests || 0)
+            : (b.guests || 0) - (a.guests || 0);
+        }
+        
+        const nameA = a.full_name?.toLowerCase() || '';
+        const nameB = b.full_name?.toLowerCase() || '';
         return sortDirection === 'asc'
-          ? (a.guests || 0) - (b.guests || 0)
-          : (b.guests || 0) - (a.guests || 0);
-      }
-      
-      // Sort by full_name
-      const nameA = a.full_name?.toLowerCase() || '';
-      const nameB = b.full_name?.toLowerCase() || '';
-      return sortDirection === 'asc'
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
-    });
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      });
+    };
+
+    return sortReservations(reservations);
   }, [reservations, sortField, sortDirection]);
 
   return (
@@ -242,7 +237,7 @@ const ReservationTable: React.FC = () => {
                 </td>
               </motion.tr>
             ))}
-            {reservations.length === 0 && (
+            {sortedReservations.length === 0 && (
               <tr className="hover:bg-gray-50">
                 <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
                   No reservations found
@@ -262,7 +257,6 @@ const ReservationTable: React.FC = () => {
           if (selectedReservation) {
             const success = await deleteReservation(selectedReservation.id);
             if (!success) {
-              // The real-time subscription will handle removing the item if deletion succeeds
               console.error('Failed to delete reservation');
             }
             setDeleteModalOpen(false);
