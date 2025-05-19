@@ -132,7 +132,7 @@ const ReservationTable: React.FC = () => {
                   {reservation.guests}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {reservation.special_occasion || 'None'}
+                  {reservation.special_occasion ? reservation.special_occasion.charAt(0).toUpperCase() + reservation.special_occasion.slice(1) : 'None'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {formatPhoneNumber(reservation.phone_number)}
