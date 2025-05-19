@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { format as dateFnsFormat } from 'date-fns';
-import { RefreshCw, Trash2 } from 'lucide-react';
+import { RefreshCw, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const ReservationTable: React.FC = () => {
+  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | null>(null);
+  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
   const { 
@@ -66,6 +68,42 @@ const ReservationTable: React.FC = () => {
     }
   };
 
+  const handleSort = (field: 'full_name' | 'reservation_date' | 'guests') => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedReservations = React.useMemo(() => {
+    if (!sortField) return reservations;
+    
+    return [...reservations].sort((a, b) => {
+      if (sortField === 'reservation_date') {
+        const dateA = new Date(a.reservation_date);
+        const dateB = new Date(b.reservation_date);
+        return sortDirection === 'asc' 
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime();
+      }
+      
+      if (sortField === 'guests') {
+        return sortDirection === 'asc'
+          ? (a.guests || 0) - (b.guests || 0)
+          : (b.guests || 0) - (a.guests || 0);
+      }
+      
+      // Sort by full_name
+      const nameA = a.full_name?.toLowerCase() || '';
+      const nameB = b.full_name?.toLowerCase() || '';
+      return sortDirection === 'asc'
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    });
+  }, [reservations, sortField, sortDirection]);
+
   return (
     <div className="w-full overflow-hidden border border-gray-200 rounded-lg">
       <div className="flex justify-between items-center p-4 bg-burgundy text-cream">
@@ -85,17 +123,59 @@ const ReservationTable: React.FC = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-charcoal text-cream">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Guest Name
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                onClick={() => handleSort('full_name')}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>Guest Name</span>
+                  {sortField === 'full_name' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Date
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                onClick={() => handleSort('reservation_date')}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>Date</span>
+                  {sortField === 'reservation_date' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Time
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Guests
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                onClick={() => handleSort('guests')}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>Guests</span>
+                  {sortField === 'guests' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Special Occasion
@@ -112,7 +192,7 @@ const ReservationTable: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {reservations.map((reservation) => (
+            {sortedReservations.map((reservation) => (
               <motion.tr
                 key={reservation.id}
                 initial={newReservationIds.has(reservation.id) ? { backgroundColor: 'rgba(212, 175, 55, 0.3)' } : {}}
