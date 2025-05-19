@@ -6,7 +6,7 @@ import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const ReservationTable: React.FC = () => {
-  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | null>(null);
+  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | null>(null);
   const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
@@ -57,7 +57,7 @@ const ReservationTable: React.FC = () => {
     }
   }, []);
 
-  const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests') => {
+  const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion') => {
     setSortField(prevField => {
       if (prevField === field) {
         setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -84,6 +84,20 @@ const ReservationTable: React.FC = () => {
         return sortDirection === 'asc'
           ? (a.guests || 0) - (b.guests || 0)
           : (b.guests || 0) - (a.guests || 0);
+      }
+      
+      if (sortField === 'reservation_time') {
+        return sortDirection === 'asc'
+          ? a.reservation_time.localeCompare(b.reservation_time)
+          : b.reservation_time.localeCompare(a.reservation_time);
+      }
+      
+      if (sortField === 'special_occasion') {
+        const occasionA = a.special_occasion?.toLowerCase() || '';
+        const occasionB = b.special_occasion?.toLowerCase() || '';
+        return sortDirection === 'asc'
+          ? occasionA.localeCompare(occasionB)
+          : occasionB.localeCompare(occasionA);
       }
       
       const nameA = a.full_name?.toLowerCase() || '';
@@ -150,8 +164,22 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Time
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                onClick={() => handleSort('reservation_time')}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>Time</span>
+                  {sortField === 'reservation_time' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
               <th 
                 className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
@@ -170,8 +198,22 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Special Occasion
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                onClick={() => handleSort('special_occasion')}
+              >
+                <div className="flex items-center space-x-1">
+                  <span>Special Occasion</span>
+                  {sortField === 'special_occasion' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Chef's Table
