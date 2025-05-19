@@ -6,8 +6,8 @@ import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const ReservationTable: React.FC = () => {
-  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | null>(null);
-  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | null>('reservation_date');
+  const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
   const { 
