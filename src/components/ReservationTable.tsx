@@ -6,7 +6,7 @@ import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const ReservationTable: React.FC = () => {
-  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | null>('reservation_date');
+  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | 'chefs_table' | null>('reservation_date');
   const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
@@ -57,7 +57,7 @@ const ReservationTable: React.FC = () => {
     }
   }, []);
 
-  const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion') => {
+  const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | 'chefs_table') => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -82,6 +82,12 @@ const ReservationTable: React.FC = () => {
         return sortDirection === 'asc'
           ? (a.guests || 0) - (b.guests || 0)
           : (b.guests || 0) - (a.guests || 0);
+      }
+      
+      if (sortField === 'chefs_table') {
+        return sortDirection === 'asc'
+          ? Number(a.chefs_table) - Number(b.chefs_table)
+          : Number(b.chefs_table) - Number(a.chefs_table);
       }
       
       if (sortField === 'reservation_time') {
@@ -180,10 +186,10 @@ const ReservationTable: React.FC = () => {
                 </div>
               </th>
               <th 
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
+                className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider cursor-pointer group"
                 onClick={() => handleSort('guests')}
               >
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center justify-center space-x-1">
                   <span>Guests</span>
                   {sortField === 'guests' ? (
                     sortDirection === 'asc' ? (
@@ -213,13 +219,27 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-                Chef's Table
+              <th 
+                className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider whitespace-nowrap cursor-pointer group"
+                onClick={() => handleSort('chefs_table')}
+              >
+                <div className="flex items-center justify-center space-x-1">
+                  <span>Chef's Table</span>
+                  {sortField === 'chefs_table' ? (
+                    sortDirection === 'asc' ? (
+                      <ArrowUp size={14} className="inline" />
+                    ) : (
+                      <ArrowDown size={14} className="inline" />
+                    )
+                  ) : (
+                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
+                  )}
+                </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Phone
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -245,24 +265,24 @@ const ReservationTable: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {formatTime(reservation.reservation_time)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                     {reservation.guests}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {reservation.special_occasion ? reservation.special_occasion.charAt(0).toUpperCase() + reservation.special_occasion.slice(1) : '---'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                     <input
                       type="checkbox"
                       checked={reservation.chefs_table}
                       readOnly
-                      className="h-4 w-4 text-burgundy border-gray-300 rounded focus:ring-burgundy"
+                      className="h-4 w-4 text-burgundy border-gray-300 rounded focus:ring-burgundy mx-auto"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {formatPhoneNumber(reservation.phone_number)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
                     <button
                       onClick={() => {
                         setSelectedReservation(reservation);
