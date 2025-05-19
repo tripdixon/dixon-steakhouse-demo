@@ -98,6 +98,9 @@ const ReservationTable: React.FC = () => {
                 Guests
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Special Occasion
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Phone
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -129,6 +132,9 @@ const ReservationTable: React.FC = () => {
                   {reservation.guests}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {reservation.special_occasion || 'None'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {formatPhoneNumber(reservation.phone_number)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -147,7 +153,7 @@ const ReservationTable: React.FC = () => {
             ))}
             {reservations.length === 0 && (
               <tr className="hover:bg-gray-50">
-                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
                   No reservations found
                 </td>
               </tr>
