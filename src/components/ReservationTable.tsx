@@ -101,6 +101,9 @@ const ReservationTable: React.FC = () => {
                 Special Occasion
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Chef's Table
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Phone
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -132,7 +135,15 @@ const ReservationTable: React.FC = () => {
                   {reservation.guests}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {reservation.special_occasion ? reservation.special_occasion.charAt(0).toUpperCase() + reservation.special_occasion.slice(1) : 'None'}
+                  {reservation.special_occasion ? reservation.special_occasion.charAt(0).toUpperCase() + reservation.special_occasion.slice(1) : '---'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={reservation.chefs_table}
+                    readOnly
+                    className="h-4 w-4 text-burgundy border-gray-300 rounded focus:ring-burgundy"
+                  />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {formatPhoneNumber(reservation.phone_number)}
@@ -153,7 +164,7 @@ const ReservationTable: React.FC = () => {
             ))}
             {reservations.length === 0 && (
               <tr className="hover:bg-gray-50">
-                <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
                   No reservations found
                 </td>
               </tr>

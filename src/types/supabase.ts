@@ -48,6 +48,7 @@ export interface Database {
           reservation_time: string
           guests: number
           special_occasion: string | null
+          chefs_table: boolean
           created_at: string
         }
         Insert: {
@@ -59,6 +60,7 @@ export interface Database {
           reservation_time: string
           guests: number
           special_occasion?: string | null
+          chefs_table?: boolean
           created_at?: string
         }
         Update: {
@@ -70,6 +72,7 @@ export interface Database {
           reservation_time?: string
           guests?: number
           special_occasion?: string | null
+          chefs_table?: boolean
           created_at?: string
         }
       }
