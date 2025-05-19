@@ -13,15 +13,20 @@ export const useReservations = () => {
   const deleteReservation = async (id: string) => {
     try {
       console.log("Deleting reservation:", id);
-
-      // Delete the reservation directly - the ON DELETE CASCADE will handle the call
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from('reservations')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select('count');
 
       if (error) {
+        console.error("Delete error:", error);
         throw error;
+      }
+
+      if (!count) {
+        console.error("No rows were deleted");
+        throw new Error('No rows were deleted');
       }
 
       // Remove from local state immediately for better UX
@@ -30,7 +35,7 @@ export const useReservations = () => {
       return true;
     } catch (err) {
       console.error("Error in deleteReservation:", err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setError(err instanceof Error ? err.message : 'Failed to delete reservation');
       return false;
     }
   };
