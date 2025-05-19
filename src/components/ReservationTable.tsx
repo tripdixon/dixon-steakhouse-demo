@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
+import { format as dateFnsFormat } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import { RefreshCw, Trash2 } from 'lucide-react';
 import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -22,7 +23,9 @@ const ReservationTable: React.FC = () => {
 
   const formatDate = (dateStr: string) => {
     try {
-      return format(new Date(dateStr), 'MMM dd, yyyy');
+      // Create a UTC date by appending 'T00:00:00Z' to ensure UTC interpretation
+      const utcDate = new Date(dateStr + 'T00:00:00Z');
+      return dateFnsFormat(utcDate, 'MMM dd, yyyy');
     } catch {
       return dateStr;
     }
@@ -32,7 +35,7 @@ const ReservationTable: React.FC = () => {
     try {
       // Handle different time formats
       const [hours, minutes] = timeStr.split(':');
-      return format(new Date().setHours(Number(hours), Number(minutes)), 'h:mm a');
+      return dateFnsFormat(new Date().setHours(Number(hours), Number(minutes)), 'h:mm a');
     } catch {
       return timeStr;
     }
