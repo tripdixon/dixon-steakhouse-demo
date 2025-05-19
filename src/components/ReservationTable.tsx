@@ -58,15 +58,13 @@ const ReservationTable: React.FC = () => {
   }, []);
 
   const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion') => {
-    setSortField(prevField => {
-      if (prevField === field) {
-        setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-        return field;
-      }
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
       setSortDirection('asc');
-      return field;
-    });
-  }, []);
+    }
+  }, [sortField]);
 
   const sortedReservations = React.useMemo(() => {
     if (!sortField || !reservations) return reservations || [];
