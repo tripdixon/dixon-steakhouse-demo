@@ -23,8 +23,7 @@ const ReservationTable: React.FC = () => {
   const formatDateTime = React.useCallback((dateTimeStr: string) => {
     try {
       const date = parseISO(dateTimeStr);
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      return formatInTimeZone(date, timeZone, "MMM dd, yyyy h:mm a zzz");
+      return formatInTimeZone(date, 'America/New_York', "MMM dd, yyyy h:mm a 'ET'");
     } catch {
       return dateTimeStr;
     }
