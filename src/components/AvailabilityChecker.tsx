@@ -35,34 +35,30 @@ const AvailabilityChecker: React.FC = () => {
   };
   
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md w-full">
-      <form onSubmit={handleCheck} className="flex flex-wrap gap-4 items-end">
-        <div className="flex gap-3">
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-              Date
-            </label>
+    <div className="w-full overflow-hidden border border-gray-200 rounded-lg bg-white">
+      <form onSubmit={handleCheck} className="flex items-center gap-4 p-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label htmlFor="date" className="text-sm font-medium text-gray-700">Date:</label>
             <input
               type="date"
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-36 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
+              className="w-36 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
               required
             />
           </div>
           
-          <div>
-            <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-              Start Time
-            </label>
+          <div className="flex items-center gap-2">
+            <label htmlFor="time" className="text-sm font-medium text-gray-700">Time:</label>
             <input
               type="time"
               id="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
+              className="w-32 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
               required
             />
           </div>
@@ -72,7 +68,7 @@ const AvailabilityChecker: React.FC = () => {
           type="submit"
           disabled={loading}
           style={{ width: BUTTON_WIDTH }}
-          className={`px-4 py-2 rounded-md text-white transition-colors ${
+          className={`px-4 py-1.5 text-sm rounded-md text-white transition-colors ${
             loading 
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-burgundy hover:bg-burgundy/90'
@@ -81,12 +77,8 @@ const AvailabilityChecker: React.FC = () => {
           {loading ? 'Checking...' : 'Check Availability'}
         </button>
         
-        {(error || result) && (
-          <div className="flex-grow" />
-        )}
-        
         {error && (
-          <div style={{ width: BUTTON_WIDTH }} className="text-center p-2 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
+          <div style={{ width: BUTTON_WIDTH }} className="text-center py-1.5 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
             {error}
           </div>
         )}
@@ -94,7 +86,7 @@ const AvailabilityChecker: React.FC = () => {
         {result && (
           <div 
             style={{ width: BUTTON_WIDTH }}
-            className={`text-center p-2 rounded-md ${
+            className={`text-center py-1.5 rounded-md ${
               result.available 
                 ? 'bg-green-100 border border-green-200 text-green-700'
                 : 'bg-red-100 border border-red-200 text-red-700'
