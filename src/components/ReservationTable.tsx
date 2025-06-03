@@ -11,6 +11,7 @@ const ReservationTable: React.FC = () => {
   const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
+  const [showUTC, setShowUTC] = React.useState(false);
   const { 
     reservations, 
     loading, 
@@ -23,11 +24,13 @@ const ReservationTable: React.FC = () => {
   const formatDateTime = React.useCallback((dateTimeStr: string) => {
     try {
       const date = parseISO(dateTimeStr);
-      return formatInTimeZone(date, 'America/New_York', "MMM dd, yyyy h:mm a 'ET'");
+      return showUTC
+        ? formatInTimeZone(date, 'UTC', "MMM dd, yyyy HH:mm 'UTC'")
+        : formatInTimeZone(date, 'America/New_York', "MMM dd, yyyy h:mm a 'ET'");
     } catch {
       return dateTimeStr;
     }
-  }, []);
+  }, [showUTC]);
 
   const formatPhoneNumber = React.useCallback((phoneStr: string) => {
     try {
@@ -142,9 +145,16 @@ const ReservationTable: React.FC = () => {
               >
                 <div className="flex items-center space-x-1">
                   <span>Date & Time</span>
-                  <span className="text-[10px] opacity-70 ml-1">
-                    (ET)
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowUTC(!showUTC);
+                    }}
+                    className="ml-1 px-1.5 py-0.5 text-[10px] bg-burgundy/20 hover:bg-burgundy/30 rounded transition-colors"
+                  >
+                    {showUTC ? 'UTC' : 'ET'}
+                  </button>
                   {sortField === 'start_date_time' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
