@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { format as dateFnsFormat } from 'date-fns';
+import { format as dateFnsFormat, parseISO } from 'date-fns';
 import { RefreshCw, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const ReservationTable: React.FC = () => {
-  const [sortField, setSortField] = React.useState<'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | 'chefs_table' | null>('reservation_date');
+  const [sortField, setSortField] = React.useState<'full_name' | 'start_date_time' | 'guests' | 'special_occasion' | 'chefs_table' | null>('start_date_time');
   const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedReservation, setSelectedReservation] = React.useState<Reservation | null>(null);
@@ -19,22 +19,12 @@ const ReservationTable: React.FC = () => {
     deleteReservation
   } = useReservations();
 
-  const formatDate = React.useCallback((dateStr: string) => {
+  const formatDateTime = React.useCallback((dateTimeStr: string) => {
     try {
-      const [year, month, day] = dateStr.split('-').map(Number);
-      const date = new Date(year, month - 1, day);
-      return dateFnsFormat(date, 'MMM dd, yyyy');
+      const date = parseISO(dateTimeStr);
+      return dateFnsFormat(date, 'MMM dd, yyyy h:mm a');
     } catch {
-      return dateStr;
-    }
-  }, []);
-
-  const formatTime = React.useCallback((timeStr: string) => {
-    try {
-      const [hours, minutes] = timeStr.split(':');
-      return dateFnsFormat(new Date().setHours(Number(hours), Number(minutes)), 'h:mm a');
-    } catch {
-      return timeStr;
+      return dateTimeStr;
     }
   }, []);
 
@@ -57,7 +47,7 @@ const ReservationTable: React.FC = () => {
     }
   }, []);
 
-  const handleSort = React.useCallback((field: 'full_name' | 'reservation_date' | 'guests' | 'reservation_time' | 'special_occasion' | 'chefs_table') => {
+  const handleSort = React.useCallback((field: 'full_name' | 'start_date_time' | 'guests' | 'special_occasion' | 'chefs_table') => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -70,9 +60,9 @@ const ReservationTable: React.FC = () => {
     if (!sortField || !reservations) return reservations || [];
     
     return [...reservations].sort((a, b) => {
-      if (sortField === 'reservation_date') {
-        const dateA = new Date(a.reservation_date);
-        const dateB = new Date(b.reservation_date);
+      if (sortField === 'start_date_time') {
+        const dateA = new Date(a.start_date_time);
+        const dateB = new Date(b.start_date_time);
         return sortDirection === 'asc' 
           ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
@@ -88,12 +78,6 @@ const ReservationTable: React.FC = () => {
         return sortDirection === 'asc'
           ? Number(a.chefs_table) - Number(b.chefs_table)
           : Number(b.chefs_table) - Number(a.chefs_table);
-      }
-      
-      if (sortField === 'reservation_time') {
-        return sortDirection === 'asc'
-          ? a.reservation_time.localeCompare(b.reservation_time)
-          : b.reservation_time.localeCompare(a.reservation_time);
       }
       
       if (sortField === 'special_occasion') {
@@ -243,7 +227,7 @@ const ReservationTable: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {formatDate(reservation.start_date_time)} {formatTime(reservation.start_date_time)}
+                    {formatDateTime(reservation.start_date_time)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                     {reservation.guests}
@@ -307,5 +291,3 @@ const ReservationTable: React.FC = () => {
     </div>
   );
 };
-
-export default ReservationTable;

@@ -38,8 +38,9 @@ Deno.serve(async (req) => {
     // Check for overlapping reservations
     const { data: overlappingReservations, error } = await supabaseClient
       .from('reservations')
-      .select('id, start_date_time, end_date_time')
-      .or(`start_date_time,lt.${end_date_time},end_date_time,gt.${start_date_time}`)
+      .select('*')
+      .lt('start_date_time', end_date_time)
+      .gt('end_date_time', start_date_time)
 
     if (error) {
       throw error
