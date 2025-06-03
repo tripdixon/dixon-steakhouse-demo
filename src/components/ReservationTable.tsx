@@ -144,7 +144,7 @@ const ReservationTable: React.FC = () => {
                 <div className="flex items-center space-x-1">
                   <span>Date & Time</span>
                   <span className="text-[10px] opacity-70 ml-1">
-                    ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+                    (ET)
                   </span>
                   {sortField === 'start_date_time' ? (
                     sortDirection === 'asc' ? (
