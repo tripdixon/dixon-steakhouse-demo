@@ -291,3 +291,5 @@ const ReservationTable: React.FC = () => {
     </div>
   );
 };
+
+export default ReservationTable
