@@ -18,9 +18,10 @@ const AvailabilityChecker: React.FC = () => {
     setResult(null);
     
     try {
-      // Create start and end datetime strings
-      const startDateTime = `${date}T${startTime}:00`;
-      const endDateTime = new Date(new Date(startDateTime).getTime() + 2 * 60 * 60 * 1000).toISOString();
+      // Convert local datetime to UTC
+      const localStart = new Date(`${date}T${startTime}:00`);
+      const startDateTime = localStart.toISOString();
+      const endDateTime = new Date(localStart.getTime() + 2 * 60 * 60 * 1000).toISOString();
       
       const response = await checkAvailability(startDateTime, endDateTime);
       setResult(response);
