@@ -3,10 +3,11 @@ import { useReservations } from '../hooks/useReservations';
 import { format } from 'date-fns';
 
 const BUTTON_WIDTH = '180px';
+const DEFAULT_DATE = new Date(2025, 5, 5, 13, 0); // June 5th, 2025 at 1:00 PM
 
 const AvailabilityChecker: React.FC = () => {
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [startTime, setStartTime] = useState('18:00');
+  const [date, setDate] = useState(format(DEFAULT_DATE, 'yyyy-MM-dd'));
+  const [startTime, setStartTime] = useState(format(DEFAULT_DATE, 'HH:mm'));
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ available: boolean; conflicting_reservations?: any[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
