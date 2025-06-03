@@ -39,9 +39,12 @@ Deno.serve(async (req) => {
     )
 
     log('info', 'Parsing request body');
-    // Parse request body
-    const { start_date_time, end_date_time }: AvailabilityRequest = await req.json()
-    log('info', 'Raw request body', { body: await req.text() });
+    // Get the raw body text first
+    const bodyText = await req.text();
+    log('info', 'Raw request body', { body: bodyText });
+    
+    // Then parse it as JSON
+    const { start_date_time, end_date_time }: AvailabilityRequest = JSON.parse(bodyText);
     log('info', 'Received request parameters', { start_date_time, end_date_time });
 
     // Validate input
