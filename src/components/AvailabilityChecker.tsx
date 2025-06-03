@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useReservations } from '../hooks/useReservations';
 import { format } from 'date-fns';
 
-const BUTTON_WIDTH = '140px';
+const BUTTON_WIDTH = '180px';
 
 const AvailabilityChecker: React.FC = () => {
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -36,8 +36,8 @@ const AvailabilityChecker: React.FC = () => {
   
   return (
     <div className="w-full overflow-hidden border border-gray-200 rounded-lg bg-white">
-      <form onSubmit={handleCheck} className="flex items-center gap-4 p-4">
-        <div className="flex items-center gap-4">
+      <form onSubmit={handleCheck} className="flex items-center gap-6 p-4">
+        <div className="flex items-center gap-6 flex-grow">
           <div className="flex items-center gap-2">
             <label htmlFor="date" className="text-sm font-medium text-gray-700">Date:</label>
             <input
@@ -46,7 +46,7 @@ const AvailabilityChecker: React.FC = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               min={format(new Date(), 'yyyy-MM-dd')}
-              className="w-36 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
+              className="flex-1 w-40 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
               required
             />
           </div>
@@ -58,45 +58,47 @@ const AvailabilityChecker: React.FC = () => {
               id="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-32 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
+              className="flex-1 w-36 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-burgundy"
               required
             />
           </div>
         </div>
         
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: BUTTON_WIDTH }}
-          className={`px-4 py-1.5 text-sm rounded-md text-white transition-colors ${
-            loading 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-burgundy hover:bg-burgundy/90'
-          }`}
-        >
-          {loading ? 'Checking...' : 'Check Availability'}
-        </button>
-        
-        {error && (
-          <div style={{ width: BUTTON_WIDTH }} className="text-center py-1.5 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-        
-        {result && (
-          <div 
+        <div className="flex items-center gap-6">
+          <button
+            type="submit"
+            disabled={loading}
             style={{ width: BUTTON_WIDTH }}
-            className={`text-center py-1.5 rounded-md ${
-              result.available 
-                ? 'bg-green-100 border border-green-200 text-green-700'
-                : 'bg-red-100 border border-red-200 text-red-700'
-            } text-sm`}
+            className={`whitespace-nowrap px-4 py-1.5 text-sm rounded-md text-white transition-colors ${
+              loading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-burgundy hover:bg-burgundy/90'
+            }`}
           >
-            {result.available 
-              ? '✓ Time slot is available!'
-              : '✗ Not available'}
-          </div>
-        )}
+            {loading ? 'Checking...' : 'Check Availability'}
+          </button>
+        
+          {error && (
+            <div style={{ width: BUTTON_WIDTH }} className="whitespace-nowrap text-center py-1.5 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+        
+          {result && (
+            <div 
+              style={{ width: BUTTON_WIDTH }}
+              className={`whitespace-nowrap text-center py-1.5 rounded-md ${
+                result.available 
+                  ? 'bg-green-100 border border-green-200 text-green-700'
+                  : 'bg-red-100 border border-red-200 text-red-700'
+              } text-sm`}
+            >
+              {result.available 
+                ? '✓ Time slot is available!'
+                : '✗ Not available'}
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
