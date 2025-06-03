@@ -168,16 +168,6 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-                    sortDirection === 'asc' ? (
-                      <ArrowUp size={14} className="inline" />
-                    ) : (
-                      <ArrowDown size={14} className="inline" />
-                    )
-                  ) : (
-                    <ArrowUp size={14} className="inline opacity-0 group-hover:opacity-50" />
-                  )}
-                </div>
-              </th>
               <th 
                 className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider cursor-pointer group"
                 onClick={() => handleSort('guests')}
