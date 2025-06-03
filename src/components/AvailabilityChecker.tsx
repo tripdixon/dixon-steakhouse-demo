@@ -65,19 +65,6 @@ const AvailabilityChecker: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-6">
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ width: BUTTON_WIDTH }}
-            className={`whitespace-nowrap px-4 py-1.5 text-sm rounded-md text-white transition-colors ${
-              loading 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-burgundy hover:bg-burgundy/90'
-            }`}
-          >
-            {loading ? 'Checking...' : 'Check Availability'}
-          </button>
-        
           {error && (
             <div style={{ width: BUTTON_WIDTH }} className="whitespace-nowrap text-center py-1.5 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
               {error}
@@ -98,6 +85,19 @@ const AvailabilityChecker: React.FC = () => {
                 : '✗ Not available'}
             </div>
           )}
+          
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ width: BUTTON_WIDTH }}
+            className={`whitespace-nowrap px-4 py-1.5 text-sm rounded-md text-white transition-colors ${
+              loading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-burgundy hover:bg-burgundy/90'
+            }`}
+          >
+            {loading ? 'Checking...' : 'Check Availability'}
+          </button>
         </div>
       </form>
     </div>
