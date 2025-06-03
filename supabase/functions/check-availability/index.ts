@@ -17,6 +17,15 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 }
 
+interface RetellRequest {
+  name: string;
+  call: Record<string, unknown>;
+  args: {
+    start_date_time: string;
+    end_date_time: string;
+  };
+}
+
 interface AvailabilityRequest {
   start_date_time: string;
   end_date_time: string;
@@ -44,7 +53,20 @@ Deno.serve(async (req) => {
     log('info', 'Raw request body', { body: bodyText });
     
     // Then parse it as JSON
-    const { start_date_time, end_date_time }: AvailabilityRequest = JSON.parse(bodyText);
+    const request: RetellRequest | AvailabilityRequest = JSON.parse(bodyText);
+    
+    // Extract parameters based on request structure
+    let start_date_time: string;
+    let end_date_time: string;
+    
+    if ('args' in request) {
+      // Retell.ai request format
+      ({ start_date_time, end_date_time } = request.args);
+    } else {
+      // Direct API call format
+      ({ start_date_time, end_date_time } = request);
+    }
+    
     log('info', 'Received request parameters', { start_date_time, end_date_time });
 
     // Validate input
