@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useReservations } from '../hooks/useReservations';
 import { format } from 'date-fns';
 
+const BUTTON_WIDTH = '140px';
+
 const AvailabilityChecker: React.FC = () => {
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [startTime, setStartTime] = useState('18:00');
@@ -33,10 +35,8 @@ const AvailabilityChecker: React.FC = () => {
   };
   
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-lg font-serif text-charcoal mb-3">Check Availability</h2>
-      
-      <form onSubmit={handleCheck} className="flex flex-wrap gap-3 items-end">
+    <div className="bg-white p-4 rounded-lg shadow-md w-full">
+      <form onSubmit={handleCheck} className="flex flex-wrap gap-4 items-end">
         <div className="flex gap-3">
           <div>
             <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
@@ -71,7 +71,8 @@ const AvailabilityChecker: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`px-4 py-2 rounded-md text-white transition-colors whitespace-nowrap ${
+          style={{ width: BUTTON_WIDTH }}
+          className={`px-4 py-2 rounded-md text-white transition-colors ${
             loading 
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-burgundy hover:bg-burgundy/90'
@@ -79,34 +80,34 @@ const AvailabilityChecker: React.FC = () => {
         >
           {loading ? 'Checking...' : 'Check Availability'}
         </button>
-      </form>
-      
-      {error && (
-        <div className="mt-3 p-2 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
-          {error}
-        </div>
-      )}
-      
-      {result && (
-        <div className={`mt-4 p-3 rounded-md ${
-          result.available 
-            ? 'bg-green-100 border border-green-200 text-green-700 text-sm'
-            : 'bg-red-100 border border-red-200 text-red-700'
-        }`}>
-          <p className="font-medium">
+        
+        {(error || result) && (
+          <div className="flex-grow" />
+        )}
+        
+        {error && (
+          <div style={{ width: BUTTON_WIDTH }} className="text-center p-2 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+        
+        {result && (
+          <div 
+            style={{ width: BUTTON_WIDTH }}
+            className={`text-center p-2 rounded-md ${
+              result.available 
+                ? 'bg-green-100 border border-green-200 text-green-700'
+                : 'bg-red-100 border border-red-200 text-red-700'
+            } text-sm`}
+          >
             {result.available 
               ? '✓ Time slot is available!'
-              : '✗ Time slot is not available'}
-          </p>
-          {!result.available && result.conflicting_reservations?.length > 0 && (
-            <p className="text-sm mt-2">
-              {result.conflicting_reservations.length} conflicting reservation(s) found
-            </p>
-          )}
-        </div>
-      )}
+              : '✗ Not available'}
+          </div>
+        )}
+      </form>
     </div>
   );
-}
+};
 
 export default AvailabilityChecker;
