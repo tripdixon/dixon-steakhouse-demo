@@ -152,12 +152,8 @@ export const useReservations = () => {
       })
       .on('system', { event: 'disconnected' }, () => {
         console.log('Disconnected from Supabase real-time channel:', channelName);
-        // Attempt to reconnect
-        setTimeout(() => {
-          console.log('Attempting to reconnect...');
-          channel.subscribe();
-        }, 2000);
       })
+
       .subscribe((status) => {
         console.log(`Subscription status for ${channelName}:`, status);
         
