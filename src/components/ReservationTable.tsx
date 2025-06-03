@@ -153,11 +153,11 @@ const ReservationTable: React.FC = () => {
               </th>
               <th 
                 className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
-                onClick={() => handleSort('reservation_date')}
+                onClick={() => handleSort('start_date_time')}
               >
                 <div className="flex items-center space-x-1">
-                  <span>Date</span>
-                  {sortField === 'reservation_date' ? (
+                  <span>Date & Time</span>
+                  {sortField === 'start_date_time' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
                     ) : (
@@ -168,13 +168,6 @@ const ReservationTable: React.FC = () => {
                   )}
                 </div>
               </th>
-              <th 
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer group"
-                onClick={() => handleSort('reservation_time')}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Time</span>
-                  {sortField === 'reservation_time' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
                     ) : (
@@ -260,10 +253,7 @@ const ReservationTable: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {formatDate(reservation.reservation_date)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {formatTime(reservation.reservation_time)}
+                    {formatDate(reservation.start_date_time)} {formatTime(reservation.start_date_time)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                     {reservation.guests}
