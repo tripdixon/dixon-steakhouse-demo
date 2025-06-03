@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Database } from '../types/supabase';
+import { format, parseISO } from 'date-fns';
 
 export type Reservation = Database['public']['Tables']['reservations']['Row'];
 
@@ -9,6 +10,34 @@ export const useReservations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newReservationIds, setNewReservationIds] = useState<Set<string>>(new Set());
+
+  const checkAvailability = async (startDateTime: string, endDateTime: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-availability`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            start_date_time: startDateTime,
+            end_date_time: endDateTime
+          })
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to check availability');
+      }
+      
+      return await response.json();
+    } catch (err) {
+      console.error('Error checking availability:', err);
+      throw err;
+    }
+  };
 
   const deleteReservation = async (id: string) => {
     try {
@@ -177,6 +206,7 @@ export const useReservations = () => {
     error,
     newReservationIds,
     refreshReservations,
-    deleteReservation
+    deleteReservation,
+    checkAvailability
   };
 };
