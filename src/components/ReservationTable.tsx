@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { format as dateFnsFormat, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { RefreshCw, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
@@ -22,7 +23,8 @@ const ReservationTable: React.FC = () => {
   const formatDateTime = React.useCallback((dateTimeStr: string) => {
     try {
       const date = parseISO(dateTimeStr);
-      return dateFnsFormat(date, 'MMM dd, yyyy h:mm a');
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return formatInTimeZone(date, timeZone, "MMM dd, yyyy h:mm a zzz");
     } catch {
       return dateTimeStr;
     }
@@ -141,6 +143,9 @@ const ReservationTable: React.FC = () => {
               >
                 <div className="flex items-center space-x-1">
                   <span>Date & Time</span>
+                  <span className="text-[10px] opacity-70 ml-1">
+                    ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+                  </span>
                   {sortField === 'start_date_time' ? (
                     sortDirection === 'asc' ? (
                       <ArrowUp size={14} className="inline" />
