@@ -60,7 +60,7 @@ const AvailabilityChecker: React.FC = () => {
       );
       
       // Refresh the reservations table
-      refreshReservations();
+      // No need to manually refresh - the real-time subscription will handle it
       
       setResult(null);
       setBookingData({

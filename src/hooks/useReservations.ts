@@ -43,6 +43,9 @@ export const useReservations = () => {
         throw new Error('Failed to book reservation');
       }
       
+      // Fetch the latest reservations immediately after booking
+      await fetchReservations();
+      
       return await response.json();
     } catch (err) {
       console.error('Error booking reservation:', err);
@@ -132,7 +135,6 @@ export const useReservations = () => {
 
   // Function to refresh reservations
   const refreshReservations = () => {
-    setLoading(true);
     fetchReservations();
   };
 
@@ -145,8 +147,7 @@ export const useReservations = () => {
   useEffect(() => {
     console.log("Setting up real-time subscription...");
     
-    // Create a more specific channel name
-    const channelName = `table-db-changes:public:reservations`;
+    const channelName = `public:reservations`;
     
     const channel = supabase
       .channel(channelName, {
@@ -167,17 +168,8 @@ export const useReservations = () => {
             const newReservation = payload.new as Reservation;
             console.log("Processing new reservation:", newReservation);
             
-            setReservations(prevReservations => {
-              // Check if the reservation already exists to avoid duplicates
-              const exists = prevReservations.some(r => r.id === newReservation.id);
-              if (exists) {
-                console.log("Reservation already exists, not adding duplicate");
-                return prevReservations;
-              }
-              
-              console.log("Adding new reservation to state");
-              return [newReservation, ...prevReservations];
-            });
+            // Fetch all reservations to ensure we have the latest data
+            fetchReservations();
             
             // Mark as new for highlighting
             setNewReservationIds(prev => {
