@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { RefreshCw, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { RefreshCw, Trash2, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useReservations, Reservation } from '../hooks/useReservations';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 
@@ -18,7 +18,11 @@ const ReservationTable: React.FC = () => {
     error, 
     newReservationIds,
     refreshReservations,
-    deleteReservation
+    deleteReservation,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedReservations
   } = useReservations();
 
   const formatDateTime = React.useCallback((dateTimeStr: string) => {
@@ -59,6 +63,12 @@ const ReservationTable: React.FC = () => {
       setSortDirection('asc');
     }
   }, [sortField]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   const sortedReservations = React.useMemo(() => {
     if (!sortField || !reservations) return reservations || [];
@@ -108,6 +118,27 @@ const ReservationTable: React.FC = () => {
       <div className="flex justify-between items-center p-4 bg-burgundy text-cream">
         <h2 className="text-xl font-serif">Booked Reservations</h2>
         <div className="flex space-x-2">
+          <div className="flex items-center space-x-2 mr-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-1 rounded hover:bg-charcoal/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Previous page"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-1 rounded hover:bg-charcoal/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Next page"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
           <button 
             onClick={refreshReservations}
             className="flex items-center bg-charcoal text-cream px-3 py-1 rounded hover:bg-charcoal/80 transition"
@@ -226,8 +257,8 @@ const ReservationTable: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {sortedReservations.length > 0 ? (
-              sortedReservations.map((reservation) => (
+            {sortedReservations.length > 0 ? 
+              paginatedReservations(sortedReservations).map((reservation) => (
                 <motion.tr
                   key={reservation.id}
                   initial={newReservationIds.has(reservation.id) ? { backgroundColor: 'rgba(212, 175, 55, 0.3)' } : {}}
