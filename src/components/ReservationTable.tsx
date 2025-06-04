@@ -305,7 +305,7 @@ const ReservationTable: React.FC = () => {
                   </td>
                 </motion.tr>
               ))
-            ) : (
+             : (
               <tr>
                 <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
                   No reservations found
