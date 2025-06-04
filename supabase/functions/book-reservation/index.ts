@@ -17,6 +17,19 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 }
 
+interface RetellRequest {
+  name: string;
+  call: Record<string, unknown>;
+  args: {
+    start_date_time: string;
+    end_date_time: string;
+    full_name: string;
+    phone_number: string;
+    guests: number;
+    special_occasion?: string;
+  };
+}
+
 interface BookingRequest {
   start_date_time: string;
   end_date_time: string;
@@ -48,27 +61,51 @@ Deno.serve(async (req) => {
     const bodyText = await req.text();
     log('info', 'Raw request body', { body: bodyText });
     
-    const request: BookingRequest = JSON.parse(bodyText);
+    const parsedBody = JSON.parse(bodyText);
+    
+    // Extract booking parameters based on request structure
+    let bookingParams: BookingRequest;
+    
+    if ('args' in parsedBody) {
+      // Handle Retell request format
+      const retellRequest = parsedBody as RetellRequest;
+      bookingParams = retellRequest.args;
+    } else {
+      // Handle direct request format
+      bookingParams = parsedBody as BookingRequest;
+    }
+    
+    // Validate required fields
+    const requiredFields = ['start_date_time', 'end_date_time', 'full_name', 'phone_number', 'guests'];
+    const missingFields = requiredFields.filter(field => !bookingParams[field]);
+    
+    if (missingFields.length > 0) {
+      log('error', 'Missing required fields', { missingFields });
+      return new Response(
+        JSON.stringify({
+          message: 'Missing required fields',
+          fields: missingFields
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
     log('info', 'Parsed booking request', {
-      start_date_time: request.start_date_time,
-      end_date_time: request.end_date_time,
-      full_name: request.full_name,
-      guests: request.guests,
-      special_occasion: request.special_occasion
+      start_date_time: bookingParams.start_date_time,
+      end_date_time: bookingParams.end_date_time,
+      full_name: bookingParams.full_name,
+      guests: bookingParams.guests,
+      special_occasion: bookingParams.special_occasion
     });
     
     // Insert the reservation
     log('info', 'Inserting reservation into database');
     const { data, error } = await supabaseClient
       .from('reservations')
-      .insert([{
-        start_date_time: request.start_date_time,
-        end_date_time: request.end_date_time,
-        full_name: request.full_name,
-        phone_number: request.phone_number,
-        guests: request.guests,
-        special_occasion: request.special_occasion
-      }])
+      .insert([bookingParams])
       .select()
       .single()
 
