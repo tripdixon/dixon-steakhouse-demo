@@ -8,6 +8,7 @@ const RESTAURANT_OPEN_HOUR = 11; // 11:00 AM EDT
 const RESTAURANT_CLOSE_HOUR = 23; // 11:00 PM EDT
 const TIME_SLOT_INCREMENT = 30; // minutes
 const RESERVATION_DURATION = 120; // minutes (2 hours)
+const DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"; // Format: YYYY-MM-DDTHH:mm:ss.sss-04:00
 
 // Helper function for structured logging
 const log = (type: 'info' | 'error', message: string, data?: any) => {
@@ -222,8 +223,8 @@ Deno.serve(async (req) => {
         findAlternative2(supabaseClient, requestedStartTime)
       ]);
 
-      if (alt1) response.alternative_datetime_1 = alt1.toISOString();
-      if (alt2) response.alternative_datetime_2 = alt2.toISOString();
+      if (alt1) response.alternative_datetime_1 = formatInTimeZone(alt1, TIMEZONE, DATE_FORMAT);
+      if (alt2) response.alternative_datetime_2 = formatInTimeZone(alt2, TIMEZONE, DATE_FORMAT);
     }
 
     log('info', 'Availability check complete', { response });
