@@ -146,13 +146,12 @@ export const useReservations = () => {
   // Set up real-time subscription with improved handling
   useEffect(() => {
     console.log("Setting up real-time subscription...");
-    
-    const channelName = `public:reservations`;
+    const channelName = `reservations-${Math.random()}`;
     
     const channel = supabase
       .channel(channelName, {
         config: {
-          broadcast: { ack: true }
+          broadcast: { ack: true, self: true }
         }
       })
       .on('postgres_changes', 
@@ -167,9 +166,15 @@ export const useReservations = () => {
           try {
             const newReservation = payload.new as Reservation;
             console.log("Processing new reservation:", newReservation);
-            
-            // Fetch all reservations to ensure we have the latest data
-            fetchReservations();
+
+            setReservations(prev => {
+              // Check if reservation already exists
+              const exists = prev.some(r => r.id === newReservation.id);
+              if (exists) return prev;
+              
+              // Add new reservation at the beginning of the list
+              return [newReservation, ...prev];
+            });
             
             // Mark as new for highlighting
             setNewReservationIds(prev => {
@@ -219,8 +224,15 @@ export const useReservations = () => {
         
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to real-time updates');
+          // Fetch initial data after subscription is established
+          fetchReservations();
         } else if (status === 'CHANNEL_ERROR') {
           console.error('Error subscribing to real-time updates');
+          // Retry subscription after error
+          setTimeout(() => {
+            console.log('Retrying subscription...');
+            channel.subscribe();
+          }, 1000);
         }
       });
 
