@@ -146,12 +146,13 @@ export const useReservations = () => {
   // Set up real-time subscription with improved handling
   useEffect(() => {
     console.log("Setting up real-time subscription...");
-    const channelName = `reservations-${Math.random()}`;
+    const channelName = 'reservations-changes';
     
     const channel = supabase
       .channel(channelName, {
         config: {
-          broadcast: { ack: true, self: true }
+          broadcast: { ack: true, self: true },
+          presence: { key: 'reservations' }
         }
       })
       .on('postgres_changes', 
@@ -167,14 +168,8 @@ export const useReservations = () => {
             const newReservation = payload.new as Reservation;
             console.log("Processing new reservation:", newReservation);
 
-            setReservations(prev => {
-              // Check if reservation already exists
-              const exists = prev.some(r => r.id === newReservation.id);
-              if (exists) return prev;
-              
-              // Add new reservation at the beginning of the list
-              return [newReservation, ...prev];
-            });
+            // Always fetch fresh data to ensure consistency
+            fetchReservations();
             
             // Mark as new for highlighting
             setNewReservationIds(prev => {
@@ -206,10 +201,8 @@ export const useReservations = () => {
         (payload) => {
           console.log("Received deletion event:", payload);
           const deletedId = payload.old.id;
-          
-          setReservations(prevReservations => 
-            prevReservations.filter(reservation => reservation.id !== deletedId)
-          );
+          // Fetch fresh data to ensure consistency
+          fetchReservations();
         }
       )
       .on('system', { event: 'connected' }, () => {
@@ -225,7 +218,7 @@ export const useReservations = () => {
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to real-time updates');
           // Fetch initial data after subscription is established
-          fetchReservations();
+          setTimeout(fetchReservations, 100);
         } else if (status === 'CHANNEL_ERROR') {
           console.error('Error subscribing to real-time updates');
           // Retry subscription after error
