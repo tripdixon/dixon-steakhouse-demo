@@ -146,13 +146,12 @@ export const useReservations = () => {
   // Set up real-time subscription with improved handling
   useEffect(() => {
     console.log("Setting up real-time subscription...");
-    const channelName = 'reservations-changes';
+    const channelName = `reservations-changes-${Math.random()}`;
     
     const channel = supabase
       .channel(channelName, {
         config: {
-          broadcast: { ack: true, self: true },
-          presence: { key: 'reservations' }
+          broadcast: { ack: true, self: true }
         }
       })
       .on('postgres_changes', 
@@ -167,9 +166,9 @@ export const useReservations = () => {
           try {
             const newReservation = payload.new as Reservation;
             console.log("Processing new reservation:", newReservation);
-
-            // Always fetch fresh data to ensure consistency
-            fetchReservations();
+            
+            // Update state directly for immediate feedback
+            setReservations(prev => [newReservation, ...prev]);
             
             // Mark as new for highlighting
             setNewReservationIds(prev => {
@@ -201,8 +200,7 @@ export const useReservations = () => {
         (payload) => {
           console.log("Received deletion event:", payload);
           const deletedId = payload.old.id;
-          // Fetch fresh data to ensure consistency
-          fetchReservations();
+          setReservations(prev => prev.filter(r => r.id !== deletedId));
         }
       )
       .on('system', { event: 'connected' }, () => {
@@ -218,14 +216,11 @@ export const useReservations = () => {
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to real-time updates');
           // Fetch initial data after subscription is established
-          setTimeout(fetchReservations, 100);
+          fetchReservations();
         } else if (status === 'CHANNEL_ERROR') {
           console.error('Error subscribing to real-time updates');
           // Retry subscription after error
-          setTimeout(() => {
-            console.log('Retrying subscription...');
-            channel.subscribe();
-          }, 1000);
+          channel.subscribe();
         }
       });
 
