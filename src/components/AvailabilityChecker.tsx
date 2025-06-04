@@ -11,8 +11,14 @@ const AvailabilityChecker: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ available: boolean; conflicting_reservations?: any[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [bookingData, setBookingData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    guests: 2,
+    specialOccasion: ''
+  });
   
-  const { checkAvailability } = useReservations();
+  const { checkAvailability, bookReservation } = useReservations();
   
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +36,38 @@ const AvailabilityChecker: React.FC = () => {
       setResult(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to check availability');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleBook = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const localStart = new Date(`${date}T${startTime}:00`);
+      const startDateTime = localStart.toISOString();
+      const endDateTime = new Date(localStart.getTime() + 2 * 60 * 60 * 1000).toISOString();
+      
+      await bookReservation(
+        startDateTime,
+        endDateTime,
+        bookingData.fullName,
+        bookingData.phoneNumber,
+        bookingData.guests,
+        bookingData.specialOccasion || undefined
+      );
+      
+      setResult(null);
+      setBookingData({
+        fullName: '',
+        phoneNumber: '',
+        guests: 2,
+        specialOccasion: ''
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to book reservation');
     } finally {
       setLoading(false);
     }
@@ -101,6 +139,73 @@ const AvailabilityChecker: React.FC = () => {
           </button>
         </div>
       </form>
+      
+      {result?.available && (
+        <div className="border-t border-gray-200 p-4">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Book this time slot</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
+              <input
+                type="text"
+                id="fullName"
+                value={bookingData.fullName}
+                onChange={(e) => setBookingData(prev => ({ ...prev, fullName: e.target.value }))}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-burgundy focus:border-burgundy"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                value={bookingData.phoneNumber}
+                onChange={(e) => setBookingData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-burgundy focus:border-burgundy"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="guests" className="block text-sm font-medium text-gray-700">Number of Guests</label>
+              <input
+                type="number"
+                id="guests"
+                min="1"
+                max="20"
+                value={bookingData.guests}
+                onChange={(e) => setBookingData(prev => ({ ...prev, guests: parseInt(e.target.value) }))}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-burgundy focus:border-burgundy"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="specialOccasion" className="block text-sm font-medium text-gray-700">Special Occasion</label>
+              <input
+                type="text"
+                id="specialOccasion"
+                value={bookingData.specialOccasion}
+                onChange={(e) => setBookingData(prev => ({ ...prev, specialOccasion: e.target.value }))}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-burgundy focus:border-burgundy"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={handleBook}
+              disabled={loading}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${
+                loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-burgundy hover:bg-burgundy/90'
+              }`}
+            >
+              {loading ? 'Booking...' : 'Book Now'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

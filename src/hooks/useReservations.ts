@@ -11,6 +11,45 @@ export const useReservations = () => {
   const [error, setError] = useState<string | null>(null);
   const [newReservationIds, setNewReservationIds] = useState<Set<string>>(new Set());
 
+  const bookReservation = async (
+    startDateTime: string,
+    endDateTime: string,
+    fullName: string,
+    phoneNumber: string,
+    guests: number,
+    specialOccasion?: string
+  ) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/book-reservation`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            start_date_time: startDateTime,
+            end_date_time: endDateTime,
+            full_name: fullName,
+            phone_number: phoneNumber,
+            guests: guests,
+            special_occasion: specialOccasion
+          })
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to book reservation');
+      }
+      
+      return await response.json();
+    } catch (err) {
+      console.error('Error booking reservation:', err);
+      throw err;
+    }
+  };
+
   const checkAvailability = async (startDateTime: string, endDateTime: string) => {
     try {
       const response = await fetch(
@@ -207,6 +246,7 @@ export const useReservations = () => {
     newReservationIds,
     refreshReservations,
     deleteReservation,
-    checkAvailability
+    checkAvailability,
+    bookReservation
   };
 };
