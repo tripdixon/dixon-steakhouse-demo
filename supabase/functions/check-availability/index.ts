@@ -1,6 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.39.3'
 import { addDays, addMinutes, parseISO, isEqual, isBefore, isAfter } from 'npm:date-fns@2.30.0'
-import { zonedTimeToUtc, utcToZonedTime } from 'npm:date-fns-tz@2.0.0'
+import { zonedTimeToUtc, utcToZonedTime, formatInTimeZone } from 'npm:date-fns-tz@2.0.0'
 
 // Constants
 const TIMEZONE = 'America/New_York';
