@@ -18,7 +18,7 @@ const AvailabilityChecker: React.FC = () => {
     specialOccasion: ''
   });
   
-  const { checkAvailability, bookReservation } = useReservations();
+  const { checkAvailability, bookReservation, refreshReservations } = useReservations();
   
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +58,9 @@ const AvailabilityChecker: React.FC = () => {
         bookingData.guests,
         bookingData.specialOccasion || undefined
       );
+      
+      // Refresh the reservations table
+      refreshReservations();
       
       setResult(null);
       setBookingData({
