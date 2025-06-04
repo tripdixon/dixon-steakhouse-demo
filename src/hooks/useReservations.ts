@@ -10,6 +10,15 @@ export const useReservations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newReservationIds, setNewReservationIds] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ROWS_PER_PAGE = 8;
+
+  const paginatedReservations = (allReservations: Reservation[]) => {
+    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+    const endIndex = startIndex + ROWS_PER_PAGE;
+    return allReservations.slice(startIndex, endIndex);
+  };
 
   const bookReservation = async (
     startDateTime: string,
@@ -121,9 +130,11 @@ export const useReservations = () => {
       if (data) {
         console.log(`Retrieved ${data.length} reservations`);
         setReservations(data);
+        setTotalPages(Math.ceil(data.length / ROWS_PER_PAGE));
       } else {
         console.log("No data returned");
         setReservations([]);
+        setTotalPages(1);
       }
     } catch (err) {
       console.error("Error fetching reservations:", err);
@@ -239,6 +250,10 @@ export const useReservations = () => {
     refreshReservations,
     deleteReservation,
     checkAvailability,
-    bookReservation
+    bookReservation,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedReservations
   };
 };
